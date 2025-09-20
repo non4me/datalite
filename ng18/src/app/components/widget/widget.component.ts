@@ -18,7 +18,7 @@ import {SafeHtmlPipe} from '../../shared/pipes/safe-html.pipe';
 })
 export class WidgetComponent {
   tickets!: CustomTicket[];
-  newTicket!: CustomTicket;
+  newTicket!: CustomTicket; // only for demo
 
   private dataService = inject(TicketService);
 
@@ -34,19 +34,23 @@ export class WidgetComponent {
   deleteTicket(ticket: CustomTicket): void {
     if (!ticket.deletePending) {
       ticket.deletePending = true;
-      this.dataService.deleteTicket(ticket)
+
+      const tickets =  [...this.tickets.filter(item => item !== ticket)];
+      const ticketKeys = JSON.stringify(tickets.map(item => item.key));
+
+      this.dataService.updateFavoriteTickets(ticketKeys)
         .pipe(
           take(1),
           catchError(() => {
             // pouze pro demo, ala mock
-            this.tickets = [...this.tickets.filter(item => item !== ticket)];
+            this.tickets = tickets;
 
             return EMPTY;
           })
         )
         .subscribe(() => {
           ticket.deletePending = false;
-          this.tickets = [...this.tickets.filter(item => item !== ticket)];
+          this.tickets = tickets;
         })
     }
   }
@@ -61,6 +65,10 @@ export class WidgetComponent {
       description: '' + Math.random()
     }
 
-    this.tickets = [...this.tickets, newTicket]
+    this.tickets = [...this.tickets, newTicket];
+
+    const ticketKeys = JSON.stringify(this.tickets.map(item => item.key));
+
+    this.dataService.updateFavoriteTickets(ticketKeys).pipe(take(1)).subscribe()
   }
 }

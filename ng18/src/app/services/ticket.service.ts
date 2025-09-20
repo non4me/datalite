@@ -18,11 +18,7 @@ export class TicketService {
     )
   }
 
-  createTicket(ticket: Ticket): Observable<any> {
-    return this.api.postTicket(ticket);
-  }
-
-  deleteTicket(ticket: Ticket): Observable<any> {
-    return this.api.deleteTicket(ticket.id);
+  updateFavoriteTickets(ticketIds: string): Observable<any> {
+    return this.api.updateFavoriteTickets(ticketIds);
   }
 }
