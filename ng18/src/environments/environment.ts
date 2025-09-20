@@ -1,0 +1,4 @@
+export const environment = {
+  BASE_URL: 'https://tsm.datalite.cloud/tsm-ticket/api/v2',
+  AUTH_TOKEN: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIwMTk5NjFlNS1kNGNjLTc1NzktOWI2Yy0zODBhZGE2NzI3MzYiLCJhdXRob3JpdGllcyI6WyJBZG1pbiJdLCJ0ZW5hbnRJZCI6ImRlZmF1bHQiLCJpc3MiOiJ0U00iLCJpYXQiOjE3NTgzODIyODEsImV4cCI6MTc1ODM4MjU4MX0.IrwgxU4gkbTpwLDJy5sfgSuJ4fdskQz9f-tPQEo1EN4j1gNHB7sDi0Tn3TcUWcVGTGoCbandUjogfBN4XSx3-w'
+};

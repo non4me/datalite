@@ -1,0 +1,53 @@
+{
+  "page": 0,
+  "size": 20,
+  "totalElements": 2,
+  "totalPages": 1,
+  "content": [
+    {
+      "id": "c9a0d4cf-4321-40d8-94ba-4bb0a77213f0",
+      "key": "TICK_6",
+      "name": "Test Ticket 2",
+      "description": "<P>XXXQQQ</P>",
+      "type": "Standardni",
+      "channel": "SAP",
+      "severity": "3_MAJOR",
+      "status": "5_CLOSED",
+      "priority": "Minor",
+      "category": "TEST",
+      "creationUser": "f05bd47a-f43a-44e1-bf1e-79823eeff891",
+      "chars": {},
+      "dataTags": [],
+      "creationDate": "2024-12-07T03:55:00.024+00:00",
+      "auditInfo": {
+        "version": 28,
+        "whoInserted": "f05bd47a-f43a-44e1-bf1e-79823eeff891",
+        "whenInserted": "2024-12-07T03:55:00.235+00:00",
+        "whoEdited": "a253b142-1169-4a14-9b3f-7f72005b80bc",
+        "whenEdited": "2025-06-30T14:30:01.647+00:00"
+      }
+    },
+    {
+      "id": "4fd7754c-c4dc-4629-ae5f-ee52d57f989a",
+      "key": "TICK_7",
+      "name": "Customer Incident",
+      "type": "Standardni",
+      "channel": "MANUAL",
+      "severity": "3_MAJOR",
+      "status": "0_NEW",
+      "priority": "Critical",
+      "category": "TEST",
+      "creationUser": "f05bd47a-f43a-44e1-bf1e-79823eeff891",
+      "chars": {},
+      "dataTags": [],
+      "creationDate": "2025-01-04T18:23:29.650+00:00",
+      "auditInfo": {
+        "version": 0,
+        "whoInserted": "f05bd47a-f43a-44e1-bf1e-79823eeff891",
+        "whenInserted": "2025-01-04T18:23:29.864+00:00",
+        "whoEdited": "f05bd47a-f43a-44e1-bf1e-79823eeff891",
+        "whenEdited": "2025-01-04T18:23:31.528+00:00"
+      }
+    }
+  ]
+}
