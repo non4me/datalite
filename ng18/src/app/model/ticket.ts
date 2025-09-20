@@ -16,5 +16,8 @@ export interface Ticket {
   dataTags: string[];
   creationDate: string; // ISO timestamp
   auditInfo: AuditInfo;
-  deletePending?: boolean
+}
+
+export interface CustomTicket extends Ticket {
+  deletePending: boolean
 }

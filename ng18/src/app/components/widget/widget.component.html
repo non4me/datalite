@@ -1,16 +1,16 @@
-<p-table [value]="tickets">
+<p-table [value]="tickets" class="table-auto">
   <ng-template #header>
     <tr>
-      <th>Key</th>
-      <th>Name</th>
-      <th>Description</th>
+      <th><strong>Key</strong></th>
+      <th><strong>Name</strong></th>
+      <th><strong>Description</strong></th>
       <th></th>
     </tr>
   </ng-template>
   <ng-template #body let-ticket>
     <tr class="size-10">
       <td>{{ ticket.key }}</td>
-      <td>{{ ticket.name }}</td>
+      <td style="w-3/12">{{ ticket.name }}</td>
       <td>
         <div [innerHTML]="ticket.description | safeHtml"></div>
       </td>
@@ -29,6 +29,8 @@
   </ng-template>
 </p-table>
 <div class="text-right p-1 pt-2">
-  <p-button (click)="add()" icon="pi pi-plus" aria-label="Add" label="Add" />
+  <p-button (click)="add()" icon="pi pi-plus" aria-label="Add" label="Add">
+<!--    <tsm-ticket-lov></tsm-ticket-lov>-->
+  </p-button>
 </div>
 

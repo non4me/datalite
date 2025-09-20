@@ -3,7 +3,7 @@ import {Component, inject} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {TableModule} from "primeng/table";
 
-import {Ticket} from '../../model/ticket';
+import {Ticket, CustomTicket} from '../../model/ticket';
 import {TicketService} from '../../services/ticket.service';
 import {SafeHtmlPipe} from '../../shared/pipes/safe-html.pipe';
 import {Button} from 'primeng/button';
@@ -17,7 +17,7 @@ import {catchError, EMPTY, take} from "rxjs";
   styleUrl: './widget.component.scss'
 })
 export class WidgetComponent {
-  tickets!: Ticket[];
+  tickets!: CustomTicket[];
   pendingAdd = false
 
   private dataService = inject(TicketService);
@@ -25,17 +25,17 @@ export class WidgetComponent {
   constructor() {
     this.dataService.getList()
       .pipe(takeUntilDestroyed())
-      .subscribe(data => this.tickets = [...data])
+      .subscribe(data => this.tickets = [...data] as CustomTicket[])
   }
 
-  deleteTicket(ticket: Ticket): void {
+  deleteTicket(ticket: CustomTicket): void {
     if(!ticket.deletePending) {
       ticket.deletePending = true;
       this.dataService.deleteTicket(ticket)
         .pipe(
           take(1),
           catchError(() => {
-            // pouze pro demo, ala mok
+            // pouze pro demo, ala mock
             this.tickets = [...this.tickets.filter(item => item !== ticket)];
 
             return  EMPTY;
