@@ -39,17 +39,14 @@ jobs:
         working-directory: .
 
       - name: Run tests (Karma with headless Chrome)
-        run: |
-          ng test --watch=false --browsers=ChromeHeadlessCI
+        run: npx ng test --watch=false --browsers=ChromeHeadlessCI
         env:
           CI: true
         continue-on-error: false
 
       - name: Build Angular app (production to ../docs)
         run: |
-          # Билд в корневую ./docs (относительно ng18)
-          ng build --configuration production --output-path ../../docs --base-href /your-repo-name/  # Замените 'your-repo-name' на имя репозитория для Pages
-        # Альтернатива: Если outputPath в angular.json: просто ng build --configuration production
+          ng build --configuration production --output-path ../../docs --base-href /non4me/datalite/
 
       - name: Verify build output
         run: |
