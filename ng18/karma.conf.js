@@ -30,17 +30,20 @@ module.exports = function (config) {
         { type: 'text-summary' }
       ]
     },
-    ChromeHeadlessCI: {
-      base: 'ChromeHeadless',
-      flags: [
-        '--no-sandbox',           // Required for CI (disables sandbox for rootless containers)
-        '--disable-dev-shm-usage', // Overcomes limited resource problems in CI
-        '--disable-gpu',          // Disables GPU (not needed in headless CI)
-        '--remote-debugging-port=9222' // Optional: for debugging if needed
-      ]
+    customLaunchers: {
+      ChromeHeadlessCI: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--no-sandbox',           // Required for CI (disables sandbox for rootless containers)
+          '--disable-dev-shm-usage', // Overcomes limited resource problems in CI
+          '--disable-gpu',          // Disables GPU (not needed in headless CI)
+          '--remote-debugging-port=9222' // Optional: for debugging if needed
+        ]
+      }
     },
     reporters: ['progress', 'kjhtml'],
     browsers: process.env.CI === 'true' ? ['ChromeHeadlessCI'] : ['Chrome'],
+    singleRun: !!process.env.CI,  // true in CI (one-time run), false otherwise (watch mode)
     restartOnFileChange: true
   });
 };
