@@ -31,14 +31,17 @@ jobs:
       - name: Install Chrome for tests (headless)
 
         run: |
+          # More robust install (add error checking)
+          sudo apt-get update -y
           wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-          sudo apt-get update
+          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update -y
           sudo apt-get install -y google-chrome-stable
-          google-chrome --version
+          google-chrome --version || (echo "Chrome install failed" && exit 1)
         working-directory: .
 
       - name: Run tests (Karma with headless Chrome)
+        working-directory: ./ng18
         run: npx ng test --watch=false --browsers=ChromeHeadlessCI
         env:
           CI: true
