@@ -21,13 +21,19 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: cd ng18 && npm install
+        run: |
+          cd ng18
+          npm install
 
       - name: Run tests
-        run: cd ng18 && npm test
+        run: |
+          cd ng18 
+          npm test
 
       - name: Build project
-        run: cd ng18 && npm run build
+        run: |
+          cd ng18
+          npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
