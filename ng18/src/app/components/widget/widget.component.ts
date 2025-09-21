@@ -5,7 +5,7 @@ import {CommonModule} from "@angular/common";
 import {TableModule} from "primeng/table";
 import {Button} from 'primeng/button';
 
-import {Ticket, CustomTicket} from '../../model/ticket';
+import {CustomTicket} from '../../model/ticket';
 import {TicketService} from '../../services/ticket.service';
 import {SafeHtmlPipe} from '../../shared/pipes/safe-html.pipe';
 
