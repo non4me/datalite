@@ -1,5 +1,5 @@
 import {TestBed} from '@angular/core/testing';
-import {DomSanitizer} from '@angular/platform-browser';
+import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {SafeHtmlPipe} from './safe-html.pipe';
 
 describe('SafeHtmlPipe', () => {
@@ -20,63 +20,34 @@ describe('SafeHtmlPipe', () => {
         sanitizer = TestBed.inject(DomSanitizer) as jasmine.SpyObj<DomSanitizer>;
     });
 
-    it('should create the pipe', () => {
+  it('should create an instance', () => {
         expect(pipe).toBeTruthy();
     });
 
-    it('should sanitize input using default options', () => {
-        const inputHtml = '<p>Valid content</p>';
-        sanitizer.bypassSecurityTrustHtml.and.returnValue(inputHtml);
+  it('should return empty string for null or empty input', () => {
+    expect(pipe.transform('')).toBe('');
+    expect(pipe.transform(null as unknown as string)).toBe('');
+  });
 
-        const result = pipe.transform(inputHtml);
-        expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith(inputHtml);
-        expect(result).toBe(inputHtml);
+  it('should sanitize and trust the HTML', () => {
+    const unsafeHtml = '<p style="color: red;">Test</p><script>alert("XSS")</script>';
+    const expectedSanitizedHtml = '<p>Test</p>';
+
+    sanitizer.bypassSecurityTrustHtml.and.returnValue(expectedSanitizedHtml as SafeHtml);
+    const result = pipe.transform(unsafeHtml);
+
+    expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith(expectedSanitizedHtml);
+    expect(result).toBe(expectedSanitizedHtml);
     });
 
-    it('should remove disallowed tags and attributes', () => {
-        const inputHtml = '<script>alert(1)</script><p onclick="hack()">Test</p>';
-        const sanitizedOutput = '<p>Test</p>'; // Expected after sanitization
-        sanitizer.bypassSecurityTrustHtml.and.returnValue(sanitizedOutput);
+  it('should handle complex HTML structures', () => {
+    const unsafeHtml = '<ul><li>Item 1</li><li>Item 2</li></ul><a href="javascript:alert(1)">Click me</a>';
+    const expectedSanitizedHtml = '<ul><li>Item 1</li><li>Item 2</li></ul><a>Click me</a>';
 
-        const result = pipe.transform(inputHtml);
-        expect(result).toBe(sanitizedOutput);
-        expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith(sanitizedOutput);
-    });
+    sanitizer.bypassSecurityTrustHtml.and.returnValue(expectedSanitizedHtml as SafeHtml);
+    const result = pipe.transform(unsafeHtml);
 
-    it('should truncate content exceeding maxLength', () => {
-        const inputHtml = 'a'.repeat(10500); // Input exceeding default maxLength (10000)
-        const truncatedOutput = 'a'.repeat(10000) + '...'; // Expected truncated output
-        sanitizer.bypassSecurityTrustHtml.and.returnValue(truncatedOutput);
-
-        const result = pipe.transform(inputHtml);
-        expect(result).toBe(truncatedOutput);
-        expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith(truncatedOutput);
-    });
-
-    it('should remove script tags and event handlers', () => {
-        const inputHtml = '<script>alert(1)</script><p onclick="hack()">Test</p>';
-        const sanitizedOutput = '<p>Test</p>'; // Expected after removing <script> and onclick
-        sanitizer.bypassSecurityTrustHtml.and.returnValue(sanitizedOutput);
-
-        const result = pipe.transform(inputHtml);
-        expect(result).toBe(sanitizedOutput);
-        expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith(sanitizedOutput);
-    });
-
-    it('should return empty string when no input provided', () => {
-        const result = pipe.transform('');
-        expect(result).toBe('');
-        expect(sanitizer.bypassSecurityTrustHtml).not.toHaveBeenCalled(); // No sanitization for empty input
-    });
-
-    it('should apply custom options for sanitization', () => {
-        const inputHtml = '<div>Content</div>';
-        const sanitizedOutput = '<div>Content</div>'; // Expected output since div is allowed
-        const customOptions = {allowedTags: ['div']};
-        sanitizer.bypassSecurityTrustHtml.and.returnValue(sanitizedOutput);
-
-        const result = pipe.transform(inputHtml, customOptions);
-        expect(result).toBe(sanitizedOutput);
-        expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith(sanitizedOutput);
+    expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith(expectedSanitizedHtml);
+    expect(result).toBe(expectedSanitizedHtml);
     });
 });

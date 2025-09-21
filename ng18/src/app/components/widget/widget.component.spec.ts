@@ -1,4 +1,4 @@
-import {ComponentFixture, inject, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, inject, TestBed, tick} from '@angular/core/testing';
 import {of} from 'rxjs';
 
 import {WidgetComponent} from './widget.component';
@@ -27,21 +27,18 @@ describe('WidgetComponent', () => {
 
     beforeEach(async () => {
         mockTicketService = jasmine.createSpyObj<TicketService>('TicketService', ['getList', 'updateFavoriteTickets']);
-
-        await TestBed.configureTestingModule({
-            imports: [WidgetComponent],
-            providers: [
-                {provide: TicketService, useValue: mockTicketService}
-            ]
-        })
-            .compileComponents();
-
-        fixture = TestBed.createComponent(WidgetComponent);
-        component = fixture.componentInstance;
-
     mockTicketService.getList.and.returnValue(of(mockTickets));
     mockTicketService.updateFavoriteTickets.and.returnValue(of(null));
 
+    await TestBed.configureTestingModule({
+      imports: [WidgetComponent],
+            providers: [
+                { provide: TicketService, useValue: mockTicketService }
+            ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(WidgetComponent);
+    component = fixture.componentInstance;
         fixture.detectChanges();
     });
 
@@ -55,20 +52,34 @@ describe('WidgetComponent', () => {
         expect(component.newTicket).toEqual(mockTickets[0]);
     }));
 
-    it('should delete ticket when not pending', () => {
-        const ticketToDelete = mockTickets[0];
+    it('should delete ticket when not pending', fakeAsync(() => {
+        // Setup services to ensure fresh component state
+        const ticket1 = { id: '1', key: 'TICK_1', description: 'Ticket 1', deletePending: false } as CustomTicket;
+        const ticket2 = { id: '2', key: 'TICK_2', description: 'Ticket 2', deletePending: false } as CustomTicket;
+        const tickets = [ticket1, ticket2];
+        mockTicketService.getList.and.returnValue(of(tickets));
+        fixture = TestBed.createComponent(WidgetComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
 
-        component.deleteTicket(ticketToDelete);
+        // Call method on ticket in the component's own tickets list!
+        const ticketToDelete = component.tickets[0];
+        component.deleteFromFavorites(ticketToDelete);
+        tick();
 
-        expect(ticketToDelete.deletePending).toBe(true);
-        expect(mockTicketService.updateFavoriteTickets).toHaveBeenCalledWith(JSON.stringify([mockTickets[1].key]));
-    });
+        // Should set deletePending=false after observable resolves
+        expect(ticketToDelete.deletePending).toBe(false);
+        // Only one ticket should remain in tickets array
+        expect(component.tickets.length).toBe(1);
+        expect(component.tickets[0].key).toBe(ticket2.key);
+        expect(mockTicketService.updateFavoriteTickets).toHaveBeenCalledOnceWith(JSON.stringify([ticket2.key]));
+    }));
 
     it('should not delete ticket when already pending', () => {
         const ticketToNotDelete = mockTickets[0];
         ticketToNotDelete.deletePending = true;
 
-        component.deleteTicket(ticketToNotDelete);
+        component.deleteFromFavorites(ticketToNotDelete);
 
         expect(ticketToNotDelete.deletePending).toBe(true);
         expect(mockTicketService.updateFavoriteTickets).not.toHaveBeenCalled();
@@ -77,7 +88,7 @@ describe('WidgetComponent', () => {
     it('should add new ticket', () => {
         const initialCount = component.tickets.length;
 
-        component.add();
+        component.addToFavorites();
 
         expect(component.tickets.length).toBe(initialCount + 1);
         expect(mockTicketService.updateFavoriteTickets).toHaveBeenCalled();

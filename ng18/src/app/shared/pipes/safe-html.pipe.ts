@@ -30,34 +30,34 @@ export class SafeHtmlPipe implements PipeTransform {
 
     const mergedOptions = {...this.defaultOptions, ...options};
 
-    // Čištění a validace obsahu
     const cleanedHtml = this.sanitizeHtml(value, mergedOptions);
-
     return this.sanitizer.bypassSecurityTrustHtml(cleanedHtml);
   }
 
   private sanitizeHtml(html: string, options: SafeHtmlOptions): string {
     let cleaned = html;
 
-    // Odstranění skriptů
     if (options.removeScripts) {
       cleaned = cleaned.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-      cleaned = cleaned.replace(/javascript:/gi, '');
-      cleaned = cleaned.replace(/on\w+\s*=/gi, ''); // odstraňujeme zpracovatele událostí
+      cleaned = cleaned.replace(/href\s*=\s*["']javascript:[^"']*["']/gi, '');
+      cleaned = cleaned.replace(/on\w+\s*=\s*["'][^"']*["']/gi, '');
+      cleaned = cleaned.replace(/<(\w+)\s+>/gi, '<$1>');
     }
 
-    // Omezení délky
     if (options.maxLength && cleaned.length > options.maxLength) {
       cleaned = cleaned.substring(0, options.maxLength) + '...';
     }
 
-    // Filtrování povolených tagů
     if (options.allowedTags) {
-      const allowedTagsRegex = new RegExp(
-        `<(?!\/?(?:${options.allowedTags.join('|')})\s*\/?>)[^>]+>`,
-        'gi'
-      );
-      cleaned = cleaned.replace(allowedTagsRegex, '');
+      cleaned = cleaned.replace(/\sstyle\s*=\s*["'][^"']*["']/gi, '');
+      cleaned = cleaned.replace(/<(\w+)\s+>/gi, '<$1>');
+      const allowedTagsSet = new Set(options.allowedTags);
+      cleaned = cleaned.replace(/<\/?(\w+)[^>]*>/gi, (match, tagName) => {
+        if (allowedTagsSet.has(tagName.toLowerCase())) {
+          return match;
+        }
+        return '';
+      });
     }
 
     return cleaned;
