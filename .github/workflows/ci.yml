@@ -1,0 +1,32 @@
+name: CI Pipeline  # Название workflow
+
+on:  # Когда запускать: на push в main или pull request
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:  # Задания (jobs)
+  test:
+    runs-on: ubuntu-latest  # ОС для выполнения: Ubuntu
+
+    steps:  # Шаги выполнения
+      - name: Checkout code
+        uses: actions/checkout@v4  # Получить код из репозитория
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'  # Версия Node.js
+
+      - name: Change root dir
+        run: cd ng18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build project
+        run: npm run build
