@@ -1,5 +1,5 @@
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {Component, inject} from '@angular/core';
+import {Component} from '@angular/core';
 import {catchError, EMPTY, take} from "rxjs";
 import {CommonModule} from "@angular/common";
 import {TableModule} from "primeng/table";
@@ -20,9 +20,10 @@ export class WidgetComponent {
   tickets!: CustomTicket[];
   newTicket!: CustomTicket; // only for demo
 
-  private dataService = inject(TicketService);
+  private dataService: TicketService;
 
-  constructor() {
+  constructor(dataService: TicketService) {
+    this.dataService = dataService;
     this.dataService.getList()
       .pipe(takeUntilDestroyed())
       .subscribe(data => {
@@ -31,7 +32,7 @@ export class WidgetComponent {
       })
   }
 
-  deleteTicket(ticket: CustomTicket): void {
+  deleteFromFavorites(ticket: CustomTicket): void {
     if (!ticket.deletePending) {
       ticket.deletePending = true;
 
@@ -55,7 +56,7 @@ export class WidgetComponent {
     }
   }
 
-  add(): void {
+  addToFavorites(): void {
     // TODO: Potřebuji specifikaci pro <tsm-ticket-lov>
     // dočasné řešení pouze pro fungování UI
     const newTicket = {
