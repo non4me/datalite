@@ -4,7 +4,6 @@ import {catchError, map, Observable, of, switchMap, throwError} from 'rxjs';
 
 import {environment} from '../../environments/environment';
 import {TicketPageResponse} from '../model/ticket-page-response';
-import {Ticket} from "../model/ticket";
 import ticketListResponse from '../mocks/list.json'
 import {UserParameter} from "../model/user-parameter";
 
