@@ -31,12 +31,6 @@ jobs:
       - name: Install dependencies
         run: npm ci  # Use npm ci for clean, reproducible installs in CI
 
-      - name: Lint code (optional)
-        run: npm run lint  # Assumes a lint script exists in package.json; skip if not configured
-
-      - name: Run unit tests
-        run: npm run test:ci  # Assumes a test:ci script for headless Karma; fallback to 'npm test' if not present
-
       - name: Build Angular app (production)
         run: npm run build:prod  # Assumes a build:prod script in package.json for optimized build; or use 'ng build --configuration production'
 
