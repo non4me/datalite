@@ -3,6 +3,7 @@ import {HttpInterceptorFn, HttpRequest, HttpResponse} from '@angular/common/http
 import {of} from 'rxjs';
 
 import {authInterceptor} from './auth.interceptor';
+import {environment} from '../../environments/environment';
 
 describe('authInterceptor', () => {
   const interceptor: HttpInterceptorFn = (req, next) =>
@@ -21,8 +22,8 @@ describe('authInterceptor', () => {
       const next = jasmine.createSpy('next').and.returnValue(of(new HttpResponse({status: 200})));
 
       // Mock environment with token
-      const originalEnv = (global as any).environment;
-      (global as any).environment = {AUTH_TOKEN: 'test-token-123'};
+      const originalToken = environment.AUTH_TOKEN;
+      environment.AUTH_TOKEN = 'test-token-123';
 
       try {
           interceptor(mockReq, next).subscribe();
@@ -40,7 +41,7 @@ describe('authInterceptor', () => {
           expect(calledReq.headers.get('accept')).toBe('application/json');
           expect(calledReq.headers.get('Authentication')).toBe('Bearer test-token-123');
       } finally {
-          (global as any).environment = originalEnv;
+          environment.AUTH_TOKEN = originalToken;
       }
   });
 
@@ -49,17 +50,17 @@ describe('authInterceptor', () => {
         const next = jasmine.createSpy('next').and.returnValue(of(new HttpResponse({status: 200})));
 
         // Mock environment without token
-        const originalEnv = (global as any).environment;
-        (global as any).environment = {AUTH_TOKEN: undefined};
+      const originalToken = environment.AUTH_TOKEN;
+      environment.AUTH_TOKEN = '';
 
         try {
             interceptor(mockReq, next).subscribe();
 
             const calledReq = next.calls.mostRecent().args[0] as HttpRequest<any>;
             expect(calledReq.headers.get('accept')).toBe('application/json');
-            expect(calledReq.headers.get('Authentication')).toBe('Bearer undefined');
+          expect(calledReq.headers.get('Authentication')).toBe('Bearer ');
         } finally {
-            (global as any).environment = originalEnv;
+          environment.AUTH_TOKEN = originalToken;
         }
     });
 });
