@@ -42,7 +42,7 @@ jobs:
 
       - name: Run tests (Karma with headless Chrome)
         working-directory: ./ng18
-        run: npx ng test --watch=false --browsers=ChromeHeadlessCI
+        run: npx ng test --watch=false
         env:
           CI: true
         continue-on-error: false
