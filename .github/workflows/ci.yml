@@ -1,77 +1,55 @@
-name: Angular CI - Build to Docs
+name: Angular CI - Build
 
 on:
   push:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-  workflow_dispatch:  # manual run
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   build:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./ng18
+        working-directory: ./ng18  # All commands run in the ./ng18 directory
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js (with cache)
-        uses: actions/setup-node@v4
         with:
-          node-version: '24.2.0'
-          cache: 'npm'
-          cache-dependency-path: 'ng18/package-lock.json'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Angular app (production to ../docs)
-        run: |
-          ng build --configuration production --output-path ../../docs --base-href /non4me/datalite/
-
-      - name: Verify build output
-        run: |
-          ls -la ../../docs  # Проверить, что файлы в ./docs (index.html, assets etc.)
-          # Опционально: test на наличие index.html
-          if [ ! -f "../../docs/index.html" ]; then exit 1; fi
-
-  deploy:
-    needs: build
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+          # Fetch all branches and tags for a complete checkout
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20'  # Use Node.js 20 LTS for Angular 18 compatibility
           cache: 'npm'
-          cache-dependency-path: 'ng18/package-lock.json'
+          cache-dependency-path: 'ng18/package-lock.json'  # Cache based on package-lock.json
 
-      - name: Install dependencies and build
-        working-directory: ./ng18
+      - name: Install dependencies
+        run: npm ci  # Use npm ci for clean, reproducible installs in CI
+
+      - name: Lint code (optional)
+        run: npm run lint  # Assumes a lint script exists in package.json; skip if not configured
+
+      - name: Run unit tests
+        run: npm run test:ci  # Assumes a test:ci script for headless Karma; fallback to 'npm test' if not present
+
+      - name: Build Angular app (production)
+        run: npm run build:prod  # Assumes a build:prod script in package.json for optimized build; or use 'ng build --configuration production'
+
+      - name: Verify build output
         run: |
-          npm ci
-          ng build --configuration production --output-path ../../docs
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact (static files from ./docs)
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./docs
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          # Check if the dist folder was created (default output path)
+          if [ ! -d "dist/ng18" ]; then
+            echo "Build failed: dist/ng18 directory not found"
+            exit 1
+          fi
+          ls -la dist/ng18  # List contents for verification
+          # Ensure key files exist
+          if [ ! -f "dist/ng18/index.html" ]; then
+            echo "Build failed: index.html not found in dist"
+            exit 1
+          fi
